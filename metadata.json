@@ -1,0 +1,6 @@
+{
+  "name": "Dawnland Development",
+  "description": "Dawnland Development is a Maine-based construction, property-development, land-planning, and project-coordination business.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
