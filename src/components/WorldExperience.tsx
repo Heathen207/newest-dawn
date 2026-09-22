@@ -31,7 +31,9 @@ import {
   MoveRight,
   ShieldCheck,
   Eye,
+  FileText,
 } from 'lucide-react';
+import { PropertyPlanningSystem } from './PropertyPlanningSystem';
 
 interface WorldExperienceProps {
   worldId: WorldId;
@@ -48,6 +50,7 @@ interface WorldPersonality {
   badgeBg: string;
   badgeBorder: string;
   badgeText: string;
+  coordinates: string;
   progressionMotto: string;
   icon: React.ReactNode;
   essence: string;
@@ -74,6 +77,7 @@ const WORLD_PERSONALITIES: Record<WorldId, WorldPersonality> = {
     badgeBg: 'bg-[#241a14]',
     badgeBorder: 'border-[#c48255]/40',
     badgeText: 'text-[#c48255]',
+    coordinates: '44.1004° N, 69.1098° W • Rockland Harbor Structural Shop',
     progressionMotto: 'Plan → Build → Coordinate → Complete',
     icon: <Hammer className="w-5 h-5 text-[#c48255]" />,
     essence: 'Physical construction, timber framing, structural repair, weather-tight building envelopes, and job-site trade execution.',
@@ -104,6 +108,7 @@ const WORLD_PERSONALITIES: Record<WorldId, WorldPersonality> = {
     badgeBg: 'bg-[#142018]',
     badgeBorder: 'border-[#4b6352]/40',
     badgeText: 'text-[#62856c]',
+    coordinates: '44.2098° N, 69.0648° W • Camden Hills Ridge & Parcel Due Diligence',
     progressionMotto: 'Property → Potential → Feasibility → Development',
     icon: <Trees className="w-5 h-5 text-[#4b6352]" />,
     essence: 'Topography, ledge, access corridors, drainage, utility routing, and pre-purchase property feasibility.',
@@ -134,6 +139,7 @@ const WORLD_PERSONALITIES: Record<WorldId, WorldPersonality> = {
     badgeBg: 'bg-[#221612]',
     badgeBorder: 'border-[#b87346]/40',
     badgeText: 'text-[#d48b59]',
+    coordinates: '44.2987° N, 69.0142° W • Lincolnville Coastal Studio & Outbuilding',
     progressionMotto: 'Imagine → Design → Visualize → Make Real',
     icon: <Sparkles className="w-5 h-5 text-[#b87346]" />,
     essence: 'Specialty structures, custom artist studios, screened pavilions, bespoke assemblies, and unconventional builds.',
@@ -164,6 +170,7 @@ const WORLD_PERSONALITIES: Record<WorldId, WorldPersonality> = {
     badgeBg: 'bg-[#1b222c]',
     badgeBorder: 'border-[#9da6b4]/40',
     badgeText: 'text-[#d8d2c6]',
+    coordinates: '44.3872° N, 69.0064° W • Northport Bayfront Synthesis',
     progressionMotto: '“You have the idea. Let us figure out how to make it real.”',
     icon: <Layers className="w-5 h-5 text-[#9da6b4]" />,
     essence: 'Turnkey build-to-suit residences, vanilla box build-outs, custom homes, and single-source project leadership.',
@@ -194,6 +201,7 @@ const WORLD_PERSONALITIES: Record<WorldId, WorldPersonality> = {
     badgeBg: 'bg-[#161a22]',
     badgeBorder: 'border-[#7a828e]/40',
     badgeText: 'text-[#eae5d8]',
+    coordinates: '44.2120° N, 69.0650° W • Midcoast Maine Practice & Stewardship',
     progressionMotto: '“We see the big picture.”',
     icon: <Compass className="w-5 h-5 text-[#7a828e]" />,
     essence: 'The connecting philosophy, hands-on leadership under Heath Titcomb, trade relationships, and enduring standards.',
@@ -326,9 +334,16 @@ export const WorldExperience: React.FC<WorldExperienceProps> = ({
                 {world.tagline}
               </p>
 
-              <div className="mt-4 flex items-center gap-2 text-xs font-sans text-[#9da6b4] uppercase tracking-wider">
-                <span className="text-[#c48255]">ORIENTATION:</span>
-                <span>{personality.progressionMotto}</span>
+              <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-sans text-[#9da6b4] uppercase tracking-wider">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[#c48255]">ORIENTATION:</span>
+                  <span>{personality.progressionMotto}</span>
+                </div>
+                <span className="text-[#3a4456] hidden sm:inline">•</span>
+                <div className="flex items-center gap-1.5 text-[#c48255] font-mono">
+                  <Compass className="w-3.5 h-3.5 text-[#c48255]" />
+                  <span>{personality.coordinates}</span>
+                </div>
               </div>
             </div>
 
@@ -628,6 +643,37 @@ export const WorldExperience: React.FC<WorldExperienceProps> = ({
                 </div>
               )}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          5B. PROJECT & PACKAGE PLANNING SYSTEM (FOR CUSTOM & BUILD WORLDS)
+      ─────────────────────────────────────────────────────────────── */}
+      {(worldId === 'CUSTOM' || worldId === 'BUILD') && (
+        <section className="py-16 px-4 sm:px-6 lg:px-8 border-b border-[#1c222e] bg-[#0c0f16]">
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-8">
+              <span
+                style={{ color: personality.themeColor }}
+                className="text-xs font-sans font-semibold tracking-[0.25em] uppercase block mb-1"
+              >
+                PROJECT PLANNING &amp; PACKAGE ARCHITECTURE
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#f5f2ea]">
+                Property Specs, Package Tiers &amp; Usable Project Data
+              </h2>
+              <p className="text-sm text-[#9da6b4] mt-2 max-w-2xl leading-relaxed">
+                Real project specifications distinguishing Remodel, Vanilla Box, Build-to-Suit, Pre-Designed, and Custom packages, including dimensional constraints, wall/roof pitches, and trade allowances.
+              </p>
+            </div>
+
+            <PropertyPlanningSystem
+              project={worldProjects[0] || cmsState.projects[0]}
+              packages={cmsState.packages}
+              onSelectWorld={onSelectWorld}
+              onStartInquiry={onOpenContact}
+            />
           </div>
         </section>
       )}

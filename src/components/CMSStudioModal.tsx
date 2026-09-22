@@ -8,8 +8,20 @@
  * - JSON Export, Import, and Reset to Factory Defaults
  */
 import React, { useState, useRef } from 'react';
-import { CMSState, WorldId, ImageRecord, ImageRole, FocalPoint, ProjectRecord } from '../types';
+import {
+  CMSState,
+  WorldId,
+  ImageRecord,
+  ImageRole,
+  FocalPoint,
+  ProjectRecord,
+  PackageTier,
+  PreDesignedPathway,
+  PackageDefinition,
+  VanillaBoxSpecs,
+} from '../types';
 import { processImageUpload } from '../services/cmsStorage';
+import { INITIAL_PACKAGES } from '../data/initialData';
 import { DawnlandImage } from './DawnlandImage';
 import {
   X,
@@ -22,6 +34,7 @@ import {
   Home,
   Layers,
   FolderKanban,
+  FileText,
   Plus,
   Trash2,
   CheckCircle2,
@@ -43,9 +56,11 @@ export const CMSStudioModal: React.FC<CMSStudioModalProps> = ({
   onResetDefaults,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<'homepage' | 'worlds' | 'projects' | 'media' | 'company'>('homepage');
+  const [activeTab, setActiveTab] = useState<'homepage' | 'worlds' | 'projects' | 'planning' | 'media' | 'company'>('homepage');
   const [selectedWorldId, setSelectedWorldId] = useState<WorldId>('BUILD');
   const [selectedProjectId, setSelectedProjectId] = useState<string>(cmsState.projects[0]?.id || '');
+  const [planningSubTab, setPlanningSubTab] = useState<'packages' | 'project-planning'>('packages');
+  const [selectedPlanningProjectId, setSelectedPlanningProjectId] = useState<string>(cmsState.projects[0]?.id || '');
   const [saveToast, setSaveToast] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -215,7 +230,19 @@ export const CMSStudioModal: React.FC<CMSStudioModalProps> = ({
             }`}
           >
             <FolderKanban className="w-3.5 h-3.5" />
-            <span>Projects & Opportunities</span>
+            <span>Projects &amp; Opportunities</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('planning')}
+            className={`py-3.5 text-xs font-sans uppercase tracking-wider border-b-2 flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'planning'
+                ? 'border-[#c49a6c] text-[#f4f2ee]'
+                : 'border-transparent text-[#788291] hover:text-[#d8d2c6]'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>Packages &amp; Planning</span>
           </button>
 
           <button
@@ -645,8 +672,131 @@ export const CMSStudioModal: React.FC<CMSStudioModalProps> = ({
                       relatedWorlds: ['BUILD', 'LAND'],
                       primaryImageId: 'img-hero-primary',
                       galleryImageIds: ['img-hero-primary'],
-                      details: {
-                        overview: 'Initial overview and architectural intent.',
+                      images: {
+                        primaryImageId: 'img-hero-primary',
+                        galleryImageIds: ['img-hero-primary'],
+                      },
+                      documents: [],
+                      property: {
+                        parcelInfo: 'Maine Coastal Lot',
+                        parcelSize: { value: 1.5, unit: 'Acres' },
+                        zoning: 'Rural Residential',
+                        terrainSlope: 'Gentle slope to granite outcropping',
+                        ledgeConditions: 'Exposed surface granite',
+                        solarOrientation: 'South-facing passive exposure',
+                        accessCorridor: 'Gravel driveway corridor',
+                        utilitiesLogistics: 'Private drilled well & on-site septic required',
+                      },
+                      existingConditions: {
+                        hasExistingStructure: false,
+                        structureType: 'Raw Maine Coastal Parcel',
+                        yearAndCondition: 'Undisturbed terrain',
+                        foundation: 'Natural Maine granite bedrock',
+                        framing: 'N/A',
+                        buildingEnvelope: 'N/A',
+                        existingUtilities: 'Utility pole at road frontage',
+                      },
+                      proposedConditions: {
+                        structureType: 'High-Performance Maine Timber Residence',
+                        proposedFootprint: { value: 1400, unit: 'SF' },
+                        livingArea: { value: 2200, unit: 'SF' },
+                        stories: 2,
+                        foundation: 'Pinned concrete pier on granite ledge with insulated crawlspace',
+                        thermalPerformance: 'Continuous exterior insulation R-30 walls, R-60 roof',
+                        mechanicalSystems: 'Cold-climate hyper-heat pumps with continuous ERV ventilation',
+                        dimensions: {
+                          length: { value: 44, unit: 'FT' },
+                          width: { value: 32, unit: 'FT' },
+                          ceilingHeightMain: { value: 9, unit: 'FT' },
+                          ceilingHeightUpper: { value: 8.5, unit: 'FT' },
+                          ridgeHeight: { value: 24, unit: 'FT' },
+                        },
+                        elevations: {
+                          north: 'Minimal fenestration to block prevailing winter winds',
+                          south: 'Extensive triple-glazed windows for passive solar gain',
+                          east: 'Morning daylight into kitchen and breakfast nook',
+                          west: 'Protected entry porch and screened pavilion',
+                          finishedGradeOffset: '+18" above bedrock',
+                        },
+                      },
+                      design: {
+                        floorLayout: {
+                          primaryConcept: 'Open-concept timber living core with private bedroom wings',
+                          bedrooms: 3,
+                          bathrooms: 2.5,
+                          primaryRooms: ['Great Room', 'Primary Suite', 'Guest Quarters', 'Screened Porch'],
+                          circulationNotes: 'Central corridor with direct exterior breezeway integration',
+                        },
+                        roofGeometry: {
+                          primaryPitch: '10:12',
+                          dormerPitch: '4:12 shed',
+                          overhangDepth: { value: 18, unit: 'IN' },
+                          fasciaDetail: 'Square-cut cedar fascia with continuous vented soffit',
+                        },
+                        wallGeometry: {
+                          wallAngles: 'Standard 90° framing with 2x6 exterior studs at 24" O.C.',
+                          shearWallEngineering: 'Engineered continuous plywood shear panels at exterior corners',
+                          ceilingProfiles: 'Cathedral timber ceiling over great room',
+                        },
+                        interiorDesign: {
+                          drywallFinish: 'Level 4 taped, primed, and painted matte off-white',
+                          trimDetails: 'Flat-stock square pine casing with revealed reveals',
+                          cabinetPreparedness: 'Blocking installed for 36" upper cabinets and island',
+                          lightingLayout: 'Dimmable recessed warm LED lighting with perimeter accent coves',
+                          flooringStatus: 'Engineered subfloor ready for wide-plank oak or tile',
+                        },
+                        exteriorDesign: {
+                          claddingType: 'Eastern white pine clapboard with white cedar shingle accents',
+                          weatherBarrier: 'Taped continuous weather-resistive barrier with rainscreen drainage mat',
+                          windowDoorRatings: 'Triple-glazed high-efficiency wood-clad units',
+                          trimWrap: 'Solid cedar corner boards and drip caps',
+                          sidingReadiness: 'Rainscreen furring strips installed and ready for siding',
+                        },
+                      },
+                      scope: {
+                        summary: 'Turnkey architectural planning, permitting, and high-performance building envelope execution.',
+                        phases: [
+                          { id: 'ph-1', name: 'Permitting & Site Preparation', duration: '4-6 Weeks', deliverables: ['Survey', 'Septic Design', 'Driveway Access'] },
+                          { id: 'ph-2', name: 'Foundation & Framing', duration: '8-10 Weeks', deliverables: ['Bedrock Pins', 'Timber Frame', 'Roof Sheathing'] },
+                          { id: 'ph-3', name: 'Enclosure & Mechanicals', duration: '6-8 Weeks', deliverables: ['Windows', 'Tyvek Weather Barrier', 'Rough MEP'] },
+                          { id: 'ph-4', name: 'Finishes & Turnkey Handover', duration: '8-12 Weeks', deliverables: ['Drywall', 'Allowances Execution', 'Final Occupancy'] },
+                        ],
+                        inclusions: ['Architectural drawings', 'Town permitting', 'Excavation', 'Foundation', 'Framing', 'Windows', 'Roofing'],
+                        exclusions: ['Client furniture', 'Post-occupancy landscaping beyond rough grade'],
+                      },
+                      packageSelection: {
+                        selectedPackage: 'Vanilla Box',
+                        preDesignedPathway: 'Build as Designed',
+                        vanillaBoxSpecs: {
+                          drywallSurfaces: 'Drywall hung, taped, and Level 4 finished',
+                          switchesAndLights: 'Standard switches and basic code lighting installed & energized',
+                          flooringExcluded: 'Flooring excluded — clean subfloors ready for final finishes',
+                          kitchenPreparedness: 'Kitchen prepared for cabinets, countertops, and appliances',
+                          weatherBarrierAndWrap: 'Tyvek weather-barrier taped with pre-flashed window pans',
+                          sidingReadyExterior: 'Siding-ready exterior with strapping and trim wrapped',
+                          structuralConstraint: 'Strictly no layout or structural changes within the baseline',
+                          escrowDisbursement: 'Upgrades held and disbursed through purchase or construction escrow',
+                        },
+                      },
+                      allowances: {
+                        siding: { amount: 22000, unit: 'Lump Sum', description: 'Exterior Siding' },
+                        cabinetsCounters: { amount: 28000, unit: 'Lump Sum', description: 'Cabinets & Countertops' },
+                        appliances: { amount: 14000, unit: 'Lump Sum', description: 'Kitchen Appliances' },
+                        flooring: { amount: 16000, unit: 'Lump Sum', description: 'Finished Flooring' },
+                        stairs: { amount: 7500, unit: 'Lump Sum', description: 'Interior Stairs' },
+                        bathroom: { amount: 12500, unit: 'Lump Sum', description: 'Bathroom Components' },
+                      },
+                      financing: {
+                        structure: 'Construction-to-Permanent Loan with Milestone Draw Schedule',
+                        lenderCoordination: 'Coordinated with regional Maine lenders (Camden National, First National Bank)',
+                        milestoneDraws: 'Standard 5-draw disbursement protocol following local code inspections',
+                        escrowHoldback: 'Client allowances held in dedicated project escrow account',
+                      },
+                      realtor: {
+                        involvement: 'Professional broker representation welcomed with standard commission protection',
+                        dueDiligenceSupport: 'Comprehensive site assessment data and septic feasibility provided for buyer review',
+                        brokerCoordination: 'Full coordination with buyer brokers throughout design and construction phases',
+                        preSaleValuation: 'Detailed comparative market analysis support for construction financing appraisal',
                       },
                       visibility: true,
                       order: cmsState.projects.length + 1,
@@ -842,6 +992,639 @@ export const CMSStudioModal: React.FC<CMSStudioModalProps> = ({
               })()}
             </div>
           )}
+
+          {/* TAB: PACKAGES & PROPERTY PLANNING */}
+          {activeTab === 'planning' && (() => {
+            const activePlanningProj = cmsState.projects.find((p) => p.id === selectedPlanningProjectId) || cmsState.projects[0];
+            const projIndex = cmsState.projects.findIndex((p) => p.id === (activePlanningProj?.id || ''));
+
+            const updateActiveProj = (mutator: (p: ProjectRecord) => void) => {
+              if (projIndex === -1) return;
+              updateCMS((draft) => {
+                mutator(draft.projects[projIndex]);
+              });
+            };
+
+            const updateVanillaBox = (field: keyof VanillaBoxSpecs, value: string) => {
+              updateActiveProj((p) => {
+                if (!p.packageSelection) {
+                  p.packageSelection = { selectedPackage: 'Vanilla Box' };
+                }
+                if (!p.packageSelection.vanillaBoxSpecs) {
+                  p.packageSelection.vanillaBoxSpecs = {
+                    drywallSurfaces: '',
+                    switchesAndLights: '',
+                    flooringExcluded: '',
+                    kitchenPreparedness: '',
+                    weatherBarrierAndWrap: '',
+                    sidingReadyExterior: '',
+                    structuralConstraint: '',
+                    escrowDisbursement: '',
+                  };
+                }
+                (p.packageSelection.vanillaBoxSpecs as any)[field] = value;
+              });
+            };
+
+            return (
+              <div className="space-y-8 max-w-5xl">
+                {/* Header Information & Sub-Tab Navigation */}
+                <div className="p-6 bg-[#11141c] border border-[#252d3e]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#222938] pb-4 mb-4">
+                    <div>
+                      <h3 className="text-sm font-sans tracking-widest uppercase text-[#c49a6c]">
+                        PACKAGES &amp; PROJECT PLANNING ARCHITECTURE
+                      </h3>
+                      <p className="text-xs text-[#8e95a0] mt-1 leading-relaxed">
+                        Manage global CMS Package definitions or project-specific planning sections across the 11 domains.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1 bg-[#0d1017] p-1 border border-[#273142] rounded-sm">
+                      <button
+                        type="button"
+                        onClick={() => setPlanningSubTab('packages')}
+                        className={`px-3 py-1.5 text-xs font-sans uppercase tracking-wider font-semibold rounded-sm transition-colors ${
+                          planningSubTab === 'packages'
+                            ? 'bg-[#c49a6c] text-black'
+                            : 'text-[#8e95a0] hover:text-white'
+                        }`}
+                      >
+                        CMS Packages ({cmsState.packages?.length || 0})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPlanningSubTab('project-planning')}
+                        className={`px-3 py-1.5 text-xs font-sans uppercase tracking-wider font-semibold rounded-sm transition-colors ${
+                          planningSubTab === 'project-planning'
+                            ? 'bg-[#c49a6c] text-black'
+                            : 'text-[#8e95a0] hover:text-white'
+                        }`}
+                      >
+                        Project Planning Data
+                      </button>
+                    </div>
+                  </div>
+
+                  {planningSubTab === 'project-planning' && (
+                    <div className="flex items-center gap-3 pt-1">
+                      <span className="text-xs font-sans uppercase text-[#c48255] font-semibold">Active Project:</span>
+                      <select
+                        value={activePlanningProj?.id || ''}
+                        onChange={(e) => setSelectedPlanningProjectId(e.target.value)}
+                        className="bg-[#181d28] border border-[#2d374a] px-3 py-1 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      >
+                        {cmsState.projects.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.title} ({p.location})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+
+                {/* 1. CMS PACKAGES MANAGEMENT */}
+                {planningSubTab === 'packages' && (
+                  <div className="space-y-6">
+                    {(cmsState.packages || []).map((pkg, idx) => (
+                      <div key={pkg.id || idx} className="p-6 bg-[#11141c] border border-[#252d3e] space-y-4">
+                        <div className="flex items-center justify-between border-b border-[#1f2533] pb-2">
+                          <h4 className="text-xs font-sans tracking-wider uppercase text-[#c49a6c] font-bold">
+                            {pkg.name} ({pkg.id})
+                          </h4>
+                          <span className="text-[11px] text-[#8e95a0] font-sans">
+                            {pkg.tier ? `Tier: ${pkg.tier}` : 'Standard Package'}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="sm:col-span-2">
+                            <label className="block text-xs font-sans text-[#8e95a0] mb-1">Package Name</label>
+                            <input
+                              type="text"
+                              value={pkg.name}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                updateCMS((draft) => {
+                                  draft.packages[idx].name = val;
+                                });
+                              }}
+                              className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-sans text-[#8e95a0] mb-1">Short Description / Subtitle</label>
+                            <textarea
+                              rows={2}
+                              value={pkg.shortDescription}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                updateCMS((draft) => {
+                                  draft.packages[idx].shortDescription = val;
+                                });
+                              }}
+                              className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-sans text-[#8e95a0] mb-1">Full Scope Narrative</label>
+                            <textarea
+                              rows={2}
+                              value={pkg.fullDescription}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                updateCMS((draft) => {
+                                  draft.packages[idx].fullDescription = val;
+                                });
+                              }}
+                              className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-sans text-[#8e95a0] mb-1">Key Inclusions (one per line)</label>
+                            <textarea
+                              rows={3}
+                              value={(pkg.inclusions || []).join('\n')}
+                              onChange={(e) => {
+                                const lines = e.target.value.split('\n');
+                                updateCMS((draft) => {
+                                  draft.packages[idx].inclusions = lines;
+                                });
+                              }}
+                              className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none font-mono"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-sans text-[#8e95a0] mb-1">Explicit Exclusions (one per line)</label>
+                            <textarea
+                              rows={3}
+                              value={(pkg.exclusions || []).join('\n')}
+                              onChange={(e) => {
+                                const lines = e.target.value.split('\n');
+                                updateCMS((draft) => {
+                                  draft.packages[idx].exclusions = lines;
+                                });
+                              }}
+                              className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none font-mono"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-sans text-[#8e95a0] mb-1">Financing Structure Notes</label>
+                            <input
+                              type="text"
+                              value={pkg.financingNotes || ''}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                updateCMS((draft) => {
+                                  draft.packages[idx].financingNotes = val;
+                                });
+                              }}
+                              className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-sans text-[#8e95a0] mb-1">Realtor &amp; Broker Notes</label>
+                            <input
+                              type="text"
+                              value={pkg.realtorNotes || ''}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                updateCMS((draft) => {
+                                  draft.packages[idx].realtorNotes = val;
+                                });
+                              }}
+                              className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* 2. PROJECT PLANNING SPECIFICATIONS */}
+                {planningSubTab === 'project-planning' && activePlanningProj && (
+                  <div className="space-y-6">
+                    {/* Active Project Banner */}
+                    <div className="p-4 bg-[#11141c] border border-[#252d3e] flex items-center justify-between">
+                      <div>
+                        <span className="text-xs uppercase text-[#c49a6c] font-sans font-semibold">Editing Project:</span>
+                        <h4 className="text-sm font-sans font-bold text-white mt-0.5">
+                          {activePlanningProj.title} &mdash; <span className="text-[#8e95a0]">{activePlanningProj.location}</span>
+                        </h4>
+                      </div>
+                      <span className="text-[11px] font-mono text-[#c48255] uppercase border border-[#c48255]/30 px-2.5 py-1">
+                        Tier: {activePlanningProj.packageSelection?.selectedPackage || 'Vanilla Box'}
+                      </span>
+                    </div>
+
+                {/* 1. PACKAGE & PATHWAY SELECTION */}
+                <div className="p-6 bg-[#11141c] border border-[#252d3e] space-y-4">
+                  <h4 className="text-xs font-sans tracking-wider uppercase text-[#c49a6c] border-b border-[#1f2533] pb-2">
+                    1. Package Tier &amp; Pathway
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Package Tier</label>
+                      <select
+                        value={activePlanningProj.packageSelection?.selectedPackage || 'Vanilla Box'}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.packageSelection) p.packageSelection = { selectedPackage: 'Vanilla Box' };
+                          p.packageSelection.selectedPackage = e.target.value as PackageTier;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      >
+                        <option value="Remodel">Remodel</option>
+                        <option value="Vanilla Box">Vanilla Box</option>
+                        <option value="Build-to-Suit">Build-to-Suit</option>
+                        <option value="Pre-Designed">Pre-Designed</option>
+                        <option value="Custom">Custom</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Pre-Designed Pathway Option</label>
+                      <select
+                        value={activePlanningProj.packageSelection?.preDesignedPathway || 'Build as Designed'}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.packageSelection) p.packageSelection = { selectedPackage: 'Vanilla Box' };
+                          p.packageSelection.preDesignedPathway = e.target.value as PreDesignedPathway;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      >
+                        <option value="Build as Designed">Build as Designed</option>
+                        <option value="Choose Options &amp; Upgrades">Choose Options &amp; Upgrades</option>
+                        <option value="Customize for Your Property">Customize for Your Property</option>
+                        <option value="Build-to-Suit Modifications">Build-to-Suit Modifications</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Vanilla Box Specs */}
+                  <div className="pt-2 border-t border-[#1f2533]">
+                    <h5 className="text-[11px] font-sans tracking-wider uppercase text-[#c48255] mb-2 font-semibold">
+                      Vanilla Box Baseline Conditions
+                    </h5>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-sans text-[#8e95a0] mb-1">Drywall Surface Status</label>
+                        <input
+                          type="text"
+                          value={activePlanningProj.packageSelection?.vanillaBoxSpecs?.drywallSurfaces || ''}
+                          onChange={(e) => updateVanillaBox('drywallSurfaces', e.target.value)}
+                          className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-sans text-[#8e95a0] mb-1">Switches &amp; Lighting Rough-In</label>
+                        <input
+                          type="text"
+                          value={activePlanningProj.packageSelection?.vanillaBoxSpecs?.switchesAndLights || ''}
+                          onChange={(e) => updateVanillaBox('switchesAndLights', e.target.value)}
+                          className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-sans text-[#8e95a0] mb-1">Flooring Preparation / Status</label>
+                        <input
+                          type="text"
+                          value={activePlanningProj.packageSelection?.vanillaBoxSpecs?.flooringExcluded || ''}
+                          onChange={(e) => updateVanillaBox('flooringExcluded', e.target.value)}
+                          className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-sans text-[#8e95a0] mb-1">Weather Envelope &amp; Wrap</label>
+                        <input
+                          type="text"
+                          value={activePlanningProj.packageSelection?.vanillaBoxSpecs?.weatherBarrierAndWrap || ''}
+                          onChange={(e) => updateVanillaBox('weatherBarrierAndWrap', e.target.value)}
+                          className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. PROPERTY & SITE SPECIFICATIONS */}
+                <div className="p-6 bg-[#11141c] border border-[#252d3e] space-y-4">
+                  <h4 className="text-xs font-sans tracking-wider uppercase text-[#c49a6c] border-b border-[#1f2533] pb-2">
+                    2. Property &amp; Site Conditions
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Parcel Overview</label>
+                      <input
+                        type="text"
+                        value={activePlanningProj.property?.parcelInfo || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.property) p.property = {} as any;
+                          p.property.parcelInfo = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Parcel Size (Acres)</label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        value={activePlanningProj.property?.parcelSize?.value || 1}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.property) p.property = {} as any;
+                          if (!p.property.parcelSize) p.property.parcelSize = { value: 1, unit: 'Acres' };
+                          p.property.parcelSize.value = parseFloat(e.target.value) || 0;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Zoning Code</label>
+                      <input
+                        type="text"
+                        value={activePlanningProj.property?.zoning || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.property) p.property = {} as any;
+                          p.property.zoning = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Slope &amp; Terrain</label>
+                      <input
+                        type="text"
+                        value={activePlanningProj.property?.terrainSlope || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.property) p.property = {} as any;
+                          p.property.terrainSlope = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Ledge / Bedrock Condition</label>
+                      <input
+                        type="text"
+                        value={activePlanningProj.property?.ledgeConditions || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.property) p.property = {} as any;
+                          p.property.ledgeConditions = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Access Corridor &amp; Drive</label>
+                      <input
+                        type="text"
+                        value={activePlanningProj.property?.accessCorridor || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.property) p.property = {} as any;
+                          p.property.accessCorridor = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. PROPOSED CONDITIONS & GEOMETRY */}
+                <div className="p-6 bg-[#11141c] border border-[#252d3e] space-y-4">
+                  <h4 className="text-xs font-sans tracking-wider uppercase text-[#c49a6c] border-b border-[#1f2533] pb-2">
+                    3. Proposed Conditions &amp; Geometry
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Structure Type</label>
+                      <input
+                        type="text"
+                        value={activePlanningProj.proposedConditions?.structureType || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.proposedConditions) p.proposedConditions = {} as any;
+                          p.proposedConditions.structureType = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Living Area (SF)</label>
+                      <input
+                        type="number"
+                        value={activePlanningProj.proposedConditions?.livingArea?.value || 0}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.proposedConditions) p.proposedConditions = {} as any;
+                          if (!p.proposedConditions.livingArea) p.proposedConditions.livingArea = { value: 0, unit: 'SF' };
+                          p.proposedConditions.livingArea.value = parseInt(e.target.value, 10) || 0;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Foundation Strategy</label>
+                      <input
+                        type="text"
+                        value={activePlanningProj.proposedConditions?.foundation || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.proposedConditions) p.proposedConditions = {} as any;
+                          p.proposedConditions.foundation = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Thermal Performance</label>
+                      <input
+                        type="text"
+                        value={activePlanningProj.proposedConditions?.thermalPerformance || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.proposedConditions) p.proposedConditions = {} as any;
+                          p.proposedConditions.thermalPerformance = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">HVAC &amp; Mechanicals</label>
+                      <input
+                        type="text"
+                        value={activePlanningProj.proposedConditions?.mechanicalSystems || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.proposedConditions) p.proposedConditions = {} as any;
+                          p.proposedConditions.mechanicalSystems = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Roof Primary Pitch</label>
+                      <input
+                        type="text"
+                        value={activePlanningProj.proposedConditions?.roofPitch || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.proposedConditions) p.proposedConditions = {} as any;
+                          p.proposedConditions.roofPitch = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. DEFINED ALLOWANCES */}
+                <div className="p-6 bg-[#11141c] border border-[#252d3e] space-y-4">
+                  <h4 className="text-xs font-sans tracking-wider uppercase text-[#c49a6c] border-b border-[#1f2533] pb-2">
+                    4. Defined Allowances ($)
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Exterior Siding ($)</label>
+                      <input
+                        type="number"
+                        value={activePlanningProj.allowances?.siding?.amount || 0}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.allowances) p.allowances = {} as any;
+                          if (!p.allowances.siding) p.allowances.siding = { amount: 0, unit: 'Lump Sum', description: 'Exterior Siding' };
+                          p.allowances.siding.amount = parseInt(e.target.value, 10) || 0;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Cabinets &amp; Counters ($)</label>
+                      <input
+                        type="number"
+                        value={activePlanningProj.allowances?.cabinetsCounters?.amount || 0}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.allowances) p.allowances = {} as any;
+                          if (!p.allowances.cabinetsCounters) p.allowances.cabinetsCounters = { amount: 0, unit: 'Lump Sum', description: 'Cabinets & Counters' };
+                          p.allowances.cabinetsCounters.amount = parseInt(e.target.value, 10) || 0;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Kitchen Appliances ($)</label>
+                      <input
+                        type="number"
+                        value={activePlanningProj.allowances?.appliances?.amount || 0}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.allowances) p.allowances = {} as any;
+                          if (!p.allowances.appliances) p.allowances.appliances = { amount: 0, unit: 'Lump Sum', description: 'Kitchen Appliances' };
+                          p.allowances.appliances.amount = parseInt(e.target.value, 10) || 0;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Finished Flooring ($)</label>
+                      <input
+                        type="number"
+                        value={activePlanningProj.allowances?.flooring?.amount || 0}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.allowances) p.allowances = {} as any;
+                          if (!p.allowances.flooring) p.allowances.flooring = { amount: 0, unit: 'Lump Sum', description: 'Finished Flooring' };
+                          p.allowances.flooring.amount = parseInt(e.target.value, 10) || 0;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Interior Stairs ($)</label>
+                      <input
+                        type="number"
+                        value={activePlanningProj.allowances?.stairs?.amount || 0}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.allowances) p.allowances = {} as any;
+                          if (!p.allowances.stairs) p.allowances.stairs = { amount: 0, unit: 'Lump Sum', description: 'Interior Stairs' };
+                          p.allowances.stairs.amount = parseInt(e.target.value, 10) || 0;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Bathroom Fixtures ($)</label>
+                      <input
+                        type="number"
+                        value={activePlanningProj.allowances?.bathroom?.amount || 0}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.allowances) p.allowances = {} as any;
+                          if (!p.allowances.bathroom) p.allowances.bathroom = { amount: 0, unit: 'Lump Sum', description: 'Bathroom Fixtures' };
+                          p.allowances.bathroom.amount = parseInt(e.target.value, 10) || 0;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5. FINANCING & REALTOR COORDINATION */}
+                <div className="p-6 bg-[#11141c] border border-[#252d3e] space-y-4">
+                  <h4 className="text-xs font-sans tracking-wider uppercase text-[#c49a6c] border-b border-[#1f2533] pb-2">
+                    5. Financing &amp; Realtor Coordination
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Financing Structure</label>
+                      <textarea
+                        rows={3}
+                        value={activePlanningProj.financing?.structure || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.financing) p.financing = {} as any;
+                          p.financing.structure = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Lender Coordination Protocol</label>
+                      <textarea
+                        rows={3}
+                        value={activePlanningProj.financing?.lenderCoordination || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.financing) p.financing = {} as any;
+                          p.financing.lenderCoordination = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Realtor Involvement &amp; Collaboration</label>
+                      <textarea
+                        rows={3}
+                        value={activePlanningProj.realtor?.involvement || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.realtor) p.realtor = {} as any;
+                          p.realtor.involvement = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-sans text-[#8e95a0] mb-1">Due Diligence Support</label>
+                      <textarea
+                        rows={3}
+                        value={activePlanningProj.realtor?.dueDiligenceSupport || ''}
+                        onChange={(e) => updateActiveProj((p) => {
+                          if (!p.realtor) p.realtor = {} as any;
+                          p.realtor.dueDiligenceSupport = e.target.value;
+                        })}
+                        className="w-full bg-[#181d28] border border-[#2d374a] px-3 py-1.5 text-xs text-white focus:border-[#c49a6c] outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
           {/* TAB 4: MEDIA LIBRARY & VERCEL BLOB */}
           {activeTab === 'media' && (

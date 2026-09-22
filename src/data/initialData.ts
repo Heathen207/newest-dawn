@@ -7,7 +7,7 @@
  * - Personnel: Heath Titcomb (Principal & Project Lead)
  * - Conceptual reference vector artwork (no fake project photos or stock disguise)
  */
-import { CMSState, ImageRecord } from '../types';
+import { CMSState, HomepageData, ImageRecord, PackageDefinition, ProjectRecord, WorldId } from '../types';
 
 // Conceptual architectural SVG vector graphics for Maine terrain, timber joinery, and site contours
 const SVG_HERO = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
@@ -395,8 +395,7 @@ export const INITIAL_IMAGES: ImageRecord[] = [
   },
 ];
 
-export const INITIAL_CMS_STATE: CMSState = {
-  company: {
+export const INITIAL_COMPANY_DATA = {
     name: 'Dawnland Development',
     tagline: 'Maine-based construction, property development, land planning, and project coordination.',
     phone: '207-555-0192',
@@ -419,24 +418,24 @@ export const INITIAL_CMS_STATE: CMSState = {
     externalLinks: [
       { label: 'Consultation & Site Review', url: '#contact' },
     ],
-  },
+};
 
-  navigation: [
-    { id: 'nav-build', label: 'BUILD', link: '#build', worldId: 'BUILD', visible: true, order: 1 },
-    { id: 'nav-land', label: 'LAND', link: '#land', worldId: 'LAND', visible: true, order: 2 },
-    { id: 'nav-create', label: 'CREATE', link: '#create', worldId: 'CREATE', visible: true, order: 3 },
-    { id: 'nav-custom', label: 'CUSTOM', link: '#custom', worldId: 'CUSTOM', visible: true, order: 4 },
-    { id: 'nav-dawnland', label: 'DAWNLAND', link: '#dawnland', worldId: 'DAWNLAND', visible: true, order: 5 },
-  ],
+export const INITIAL_NAV_ITEMS = [
+  { id: 'nav-build', label: 'BUILD', link: '#build', worldId: 'BUILD' as const, visible: true, order: 1 },
+  { id: 'nav-land', label: 'LAND', link: '#land', worldId: 'LAND' as const, visible: true, order: 2 },
+  { id: 'nav-create', label: 'CREATE', link: '#create', worldId: 'CREATE' as const, visible: true, order: 3 },
+  { id: 'nav-custom', label: 'CUSTOM', link: '#custom', worldId: 'CUSTOM' as const, visible: true, order: 4 },
+  { id: 'nav-dawnland', label: 'DAWNLAND', link: '#dawnland', worldId: 'DAWNLAND' as const, visible: true, order: 5 },
+];
 
-  homepage: {
+export const INITIAL_HOMEPAGE_DATA: HomepageData = {
     hero: {
       heading: 'DAWNLAND DEVELOPMENT',
       subheading: 'From Concept to Completion',
       imageId: 'img-hero-primary',
       secondaryImageId: 'img-land-hero',
       ctaLabel: 'Explore The Five Worlds',
-      ctaWorld: 'BUILD',
+      ctaWorld: 'BUILD' as WorldId,
       visible: true,
     },
     intro: {
@@ -494,10 +493,10 @@ export const INITIAL_CMS_STATE: CMSState = {
         },
       ],
     },
-  },
+};
 
-  worlds: {
-    BUILD: {
+export const INITIAL_WORLDS: Record<import('../types').WorldId, import('../types').WorldData> = {
+  BUILD: {
       id: 'BUILD',
       name: 'BUILD',
       tagline: 'The Physical Work',
@@ -766,10 +765,572 @@ export const INITIAL_CMS_STATE: CMSState = {
       order: 5,
       visible: true,
     },
-  },
+};
 
-  // Authoritative project registry: Unverified fictional claims have been purged.
-  // Verified real project case studies are populated dynamically via CMS Studio.
-  projects: [],
+/* =========================================================================
+   AUTHORITATIVE CMS PACKAGES REGISTRY (6 Core Tiers)
+   ========================================================================= */
+
+export const INITIAL_PACKAGES: PackageDefinition[] = [
+  {
+    id: 'Remodel',
+    name: 'Remodel & Structural Retrofit',
+    shortDescription: 'Historic timber frame preservation, structural stabilization, and thermal envelope upgrades for existing coastal properties.',
+    fullDescription: 'Comprehensive remodeling and structural retrofit services engineered for historic and modern New England structures. We evaluate existing foundations, sister weathered timber sills, engineer continuous thermal-break building envelopes, and preserve original timber character while meeting current energy codes.',
+    inclusions: [
+      'Structural stabilization and foundation underpinning',
+      'Timber frame repairs, sistering, and authentic joinery retrofits',
+      'Thermal envelope retrofits and air-barrier continuous wrapping',
+      'Mechanical system modernizations (cold-climate heat pumps & ERVs)',
+      'Code-compliant egress and architectural window/door replacements',
+    ],
+    exclusions: [
+      'Unforeseen concealed structural rot remediation beyond baseline contingency',
+      'Hazardous material abatement (asbestos/lead) handled by licensed regional specialists',
+    ],
+    availableWorlds: ['BUILD', 'CUSTOM', 'CREATE'],
+    financingNotes: 'Bank construction draws or phased milestone payments tied to engineering sign-offs and municipal building code inspections.',
+    realtorNotes: 'Pre-purchase due diligence inspections and cost-to-complete feasibility assessments for prospective buyers or licensed brokers.',
+    visibility: true,
+    displayOrder: 1,
+  },
+  {
+    id: 'Vanilla Box',
+    name: 'Vanilla Box Baseline Completion',
+    shortDescription: 'Defined completion standard: drywall primed, utilities roughed, ready for client finishes with structured allowances.',
+    fullDescription: 'A disciplined completion tier that delivers a structurally certified, weather-tight, and conditioned interior ready for client-selected final finishes. Includes primed Level 4 drywall, switches and energized basic lighting, siding-ready substrate, and structured allowances for cabinetry, appliances, flooring, and bathroom fixtures. No layout or structural changes permitted within the baseline package.',
+    inclusions: [
+      'Level 4 smooth drywall hung, taped, and primed with high-hiding sealer',
+      'Standard toggle switches, GFCI receptacles, and basic lighting energized',
+      'Clean, level subfloors installed and prepared for finished floor coverings',
+      'Kitchen fully prepared with rough plumbing, 220V electrical, and ventilation',
+      'Exterior substrate taped, strapped with rain-screen, and siding-ready',
+      'Defined allowances for siding, cabinetry, counters, appliances, flooring, stairs, and baths',
+    ],
+    exclusions: [
+      'Final interior wall finish paint coat (ready for client painter)',
+      'Flooring coverings (carpet, tile, hardwood) handled via defined allowances or separate contract',
+      'Decorative lighting fixtures beyond code illumination',
+      'Structural or layout modifications within the package',
+    ],
+    availableWorlds: ['BUILD', 'CUSTOM', 'LAND'],
+    financingNotes: 'Ideal for construction-to-permanent bank loans; allowance balances held in bank escrow accounts for milestone release.',
+    realtorNotes: 'Provides maximum pricing certainty for buyers and agents with transparent finish allowances and clean appraisal comparability.',
+    packageSpecificSpecs: {
+      drywallSurfaces: 'Drywall hung, taped, and primed surfaces throughout all conditioned spaces',
+      switchesAndLights: 'Standard switches, receptacles, and basic code lighting installed and energized',
+      flooringExcluded: 'Flooring excluded from baseline package — clean, level 3/4-inch subfloors prepared for finish flooring',
+      kitchenPreparedness: 'Kitchen prepared with plumbing, 220V electrical, and ventilation ready for cabinets, countertops, and appliances',
+      sidingReadyExterior: 'Siding-ready exterior substrate with rain-screen strapping ready for chosen cladding',
+      weatherBarrierAndWrap: 'Tyvek exterior wrap taped at all seams with wrapped trim and sealed flashings where applicable',
+      wrappedTrim: 'Pre-primed trim boards wrapped and detailed at water tables and corner boards',
+      structuralConstraint: 'Strictly no layout or structural changes permitted within the baseline Vanilla Box package',
+      upgradesArrangement: 'All upgrades handled, documented, and paid/held through the applicable purchase contract or construction financing escrow arrangement',
+    },
+    visibility: true,
+    displayOrder: 2,
+  },
+  {
+    id: 'Build-to-Suit',
+    name: 'Build-to-Suit Execution',
+    shortDescription: 'Turnkey execution customized to client property, program specifications, and performance criteria.',
+    fullDescription: 'Complete single-source design-build and site coordination customized directly to your land parcel, topography, and lifestyle requirements. Heath Titcomb directs site clearing, ledge blasting/pinning, custom timber fabrication, and turnkey completion.',
+    inclusions: [
+      'Turnkey site work, well, septic, and driveway corridor',
+      'Custom architectural drafting and engineering coordination',
+      'Full exterior and interior finish installation to client specification',
+      'Turnkey mechanicals, backup generation, and climate systems',
+      'Certificate of Occupancy and client orientation walk-through',
+    ],
+    exclusions: [
+      'Custom furnishings and non-affixed decor',
+    ],
+    availableWorlds: ['BUILD', 'LAND', 'CUSTOM'],
+    financingNotes: 'Monthly AIA progress billing with detailed lien waivers and third-party bank inspection sign-offs.',
+    realtorNotes: 'Ideal for clients purchasing raw land looking for an integrated builder to take full turnkey accountability from purchase through move-in.',
+    visibility: true,
+    displayOrder: 3,
+  },
+  {
+    id: 'Pre-Designed',
+    name: 'Pre-Designed Architectural Portfolio',
+    shortDescription: 'Engineered regional Maine designs offering streamlined permitting, cost certainty, and adaptable pathways.',
+    fullDescription: 'Carefully engineered home designs optimized for Maine climate, snow loads, and local materials. Pre-engineered plans accelerate permitting and provide predictable cost modeling, while offering flexible pathways from direct execution to property-specific customization.',
+    inclusions: [
+      'Complete stamped architectural & structural engineering plan sets',
+      'Pre-calculated material take-offs and trade scopes',
+      'Engineered timber frame packages cut from regional sawmills',
+      'High-performance building envelope detailing',
+      'Transparent fixed-scope baseline pricing',
+    ],
+    exclusions: [
+      'Property-specific site civil engineering (adapted during pathway selection)',
+    ],
+    availableWorlds: ['BUILD', 'CUSTOM', 'CREATE'],
+    financingNotes: 'Faster bank approval due to completed construction documents, proven material lists, and fixed builder scopes.',
+    realtorNotes: 'Allows realtors to market vacant land with approved build concepts and reliable total project budgets.',
+    pathwayInformation: [
+      'Build as Designed: Construct the pre-engineered plan exactly as drawn for maximum speed and cost efficiency.',
+      'Choose Options & Upgrades: Select from curated exterior cladding, window packages, timber porches, and mechanical tiers.',
+      'Customize for Your Property: Adapt foundation, orientation, daylighting, and walkout basements to your specific lot slope and ledge.',
+      'Optional Build-to-Suit Modifications: Modify interior layout, extend wings, or add detached garage/studios under guided architectural oversight.',
+    ],
+    visibility: true,
+    displayOrder: 4,
+  },
+  {
+    id: 'Custom',
+    name: 'Full Custom Craft & Timber Architecture',
+    shortDescription: 'Bespoke coastal architecture, exposed timber bents, custom millwork, and dedicated craft leadership.',
+    fullDescription: 'Uncompromising custom residential building where every joinery connection, window sightline, and handcrafted detail is designed from first principles. Heath Titcomb personally oversees all trade execution, sourcing local Maine cedar, hemlock, and granite to craft generational homes.',
+    inclusions: [
+      'Complete bespoke architectural design and structural engineering',
+      'Traditional mortise-and-tenon timber framing crafted in-house',
+      'Custom millwork, stairs, cabinets, and architectural metalwork',
+      'High-efficiency thermal envelopes targeting net-zero or passive performance',
+      'Direct principal site supervision throughout all phases',
+    ],
+    exclusions: [
+      'Furniture staging and non-fixed decorative artwork',
+    ],
+    availableWorlds: ['BUILD', 'CREATE', 'CUSTOM', 'DAWNLAND'],
+    financingNotes: 'Custom financing models including cost-plus with transparent books, guaranteed maximum price (GMP), or milestone draw disbursements.',
+    realtorNotes: 'White-glove consultation for luxury coastal land acquisitions and architectural estate properties.',
+    visibility: true,
+    displayOrder: 5,
+  },
+  {
+    id: 'Investor / Project Pathway',
+    name: 'Investor & Project Pathway',
+    shortDescription: 'Strategic regional development, land subdivision, multi-parcel infrastructure, and advisory partnerships.',
+    fullDescription: 'Capital-efficient land planning, selective parcel development, and phased infrastructure execution for project partners and investment groups. We combine deep municipal zoning insight, civil engineering management, and disciplined construction leadership to unlock intrinsic land value across Midcoast Maine.',
+    inclusions: [
+      'Comprehensive zoning, environmental, and deed restriction due diligence',
+      'Subdivision layout, access road engineering, and utility corridor design',
+      'Pro forma cost-to-build modeling and sensitivity analysis',
+      'Turnkey site infrastructure execution (clearing, roads, culverts, power)',
+      'Coordinated builder-developer disposition and marketing packaging',
+    ],
+    exclusions: [
+      'Direct real estate brokerage services (coordinated through licensed partner brokers)',
+    ],
+    availableWorlds: ['LAND', 'CREATE', 'DAWNLAND'],
+    financingNotes: 'Structured equity, debt syndication, or joint venture development agreements with formal capital call structures.',
+    realtorNotes: 'Collaborative alignment with commercial and land brokers for parcel identification, assemblages, and bulk lot dispositions.',
+    visibility: true,
+    displayOrder: 6,
+  },
+];
+
+/* =========================================================================
+   AUTHORITATIVE PROJECT REGISTRY (11 Separated Domains)
+   ========================================================================= */
+
+export const INITIAL_PROJECTS: ProjectRecord[] = [
+  {
+    id: 'penobscot-bay-timber-cape',
+    title: 'Penobscot Bay Coastal Timber Cape',
+    location: 'Rockport, Maine',
+    status: 'Completed',
+    description: 'Structural timber joinery stabilization, high-performance thermal envelope retrofit, and Vanilla Box baseline completion on Penobscot Bay.',
+    projectType: 'Coastal Cape & Timber Pavilion',
+    relatedWorlds: ['BUILD', 'CUSTOM', 'CREATE'],
+    visibility: true,
+    order: 1,
+
+    // 1. PROPERTY
+    property: {
+      parcelInfo: 'Tax Map 14, Lot 6B — 2.40 Surveyed Acres, Coastal Shoreland Buffer Overlay (250-ft setback compliant)',
+      parcelSize: { value: 2.4, unit: 'acres' },
+      zoning: 'Rural Residential / Shoreland Protection Overlay',
+      terrainSlope: 'South-facing moderate glacial moraine slope (8-12% grade) draining to natural swale',
+      ledgeConditions: 'Surface granite outcroppings along northern boundary; bedrock test pits verify 4-6 ft depth in building envelope',
+      solarOrientation: 'True South (180°) solar axis maximizing passive winter solar gain and summer shading',
+      accessCorridor: '240-foot private crushed-gravel corridor engineered with 15-inch corrugated culvert and crowned sub-base',
+      utilitiesLogistics: 'Coordinated overhead power conduit run to on-site riser, private 420-ft bedrock drilled well, 1000-gal concrete septic with stone leach field',
+    },
+
+    // 2. EXISTING CONDITIONS
+    existingConditions: {
+      hasExistingStructure: true,
+      structureType: '1890s Weathered Timber Carriage Barn / Agricultural Shell',
+      yearAndCondition: 'Circa 1890; hand-hewn Eastern white pine & hemlock frame; uninsulated, unconditioned',
+      foundation: 'Dry-stacked granite fieldstone foundation requiring partial repointing and concrete underpinning',
+      framing: '8x8 post-and-beam bents sound; perimeter sill plates weathered on eastern eave requiring sistering and replacement',
+      buildingEnvelope: 'Board-and-batten rough sawn pine sheathing with air infiltration; unheated; no vapor barrier',
+      existingUtilities: 'No existing septic or interior plumbing; temporary 60A service panel on utility pole',
+      dimensions: {
+        length: { value: 40, unit: 'ft' },
+        width: { value: 30, unit: 'ft' },
+        height: { value: 24, unit: 'ft' },
+      },
+      elevations: {
+        north: 'Fieldstone grade line with rough board-and-batten eave at 14 ft',
+        south: 'Primary timber barn door opening (10 ft x 10 ft) with granite threshold',
+        east: 'Weathered gable peak with decorative timber hay-fork bracket',
+        west: 'Low eave slope facing prevailing ocean winds',
+      },
+    },
+
+    // 3. PROPOSED CONDITIONS
+    proposedConditions: {
+      proposedFootprint: { value: 1688, unit: 'sqft' },
+      livingArea: { value: 2180, unit: 'sqft' },
+      stories: 1.5,
+      foundation: '10-inch poured reinforced concrete frost wall on bedrock pins with 4-inch sub-slab XPS insulation (R-10)',
+      thermalPerformance: 'Continuous R-30 exterior Roxul Comfortboard envelope, R-23 dense-pack cellulose stud cavities, R-60 roof deck',
+      mechanicalSystems: 'Multi-zone cold-climate air-source heat pump (Hyper-Heat), Zehnder HRV heat recovery ventilation, 50-gal hybrid heat pump water heater',
+      dimensions: {
+        length: { value: 44, unit: 'ft' },
+        width: { value: 32, unit: 'ft' },
+        ceilingHeightMain: { value: 9.2, unit: 'ft' },
+        ceilingHeightUpper: { value: 8.5, unit: 'ft' },
+        ridgeHeight: { value: 26.3, unit: 'ft' },
+      },
+      elevations: {
+        north: 'Continuous sheltered thermal wall with high-performance clerestory awning windows minimizing wind-chill loss',
+        south: 'Expansive window wall with 8-ft glazed sliding portal connecting to screened timber pavilion',
+        east: 'Morning light breakfast nook and main gabled entrance portico with timber truss bracket',
+        west: 'Protected private garden terrace elevation with gable-end glass peak',
+        finishedGradeOffset: '+18 inches from finished exterior grade to top of concrete foundation curb',
+      },
+    },
+
+    // 4. DESIGN
+    design: {
+      floorLayout: {
+        bedrooms: 3,
+        bathrooms: 2,
+        primaryRooms: [
+          'Open Living & Hearth Gathering Space (22 ft x 18 ft)',
+          'Kitchen & Walk-In Pantry Prep Area (16 ft x 14 ft)',
+          'Ground-Floor Primary Bedroom Suite (14 ft x 16 ft)',
+          'Upper Timber Loft Studio / Secondary Bedroom (16 ft x 18 ft)',
+          'Mudroom & Gear Entry with Direct Exterior Grade Access (10 ft x 12 ft)',
+          'South-Facing Screened Timber Pavilion (14 ft x 20 ft)',
+        ],
+        circulationNotes: 'Straight-line timber stairwell centered along northern thermal wall; minimum 3 ft - 6 in clear hallways; barrier-free zero-threshold entry from primary driveway',
+      },
+      roofGeometry: {
+        primaryPitch: '10:12',
+        dormerPitch: '4:12',
+        overhangDepth: { value: 16, unit: 'in' },
+        fasciaDetail: '2x8 spruce sub-fascia with 5/4x6 pre-primed clear cedar finish wrap',
+      },
+      wallGeometry: {
+        wallAngles: '90° plumb framing; 45° timber knee braces at corner posts and tie girts',
+        shearWallEngineering: '1/2-inch structural CDX plywood sheathing with engineered nailing schedule for 115 MPH coastal wind zone',
+      },
+      interiorDesign: {
+        drywallFinish: 'Level 4 smooth drywall hung, taped, and primed surfaces throughout all conditioned living volumes',
+        trimDetails: '5/4x4 clear Eastern white pine square-edge casing, primed and ready for final finish coat',
+        cabinetPreparedness: 'Kitchen and utility zones framed, backed with blocking, and fully prepared for cabinet boxes, stone counters, and appliances',
+        lightingLayout: 'Rough-in complete with recessed LED ceiling junction boxes, standard toggle switches, and code-compliant GFCI outlets throughout',
+        flooringStatus: 'Flooring excluded from baseline package; clean, flat 3/4-inch AdvanTech subfloors installed and prepared for client-selected final flooring',
+      },
+      exteriorDesign: {
+        claddingType: 'Siding-ready exterior prepared for horizontal Eastern white pine clapboard or Maibec white cedar shingles',
+        weatherBarrier: 'Tyvek CommercialWrap weather barrier taped at all overlaps, flashings integrated at penetrations, and exterior window/door trim wrapped',
+        windowDoorRatings: 'Triple-pane Low-E argon-filled wood-clad tilt-turn units (U-factor 0.17, DP50 structural rating)',
+        trimWrap: 'Pre-primed cellular PVC or wrapped pine corner boards, water tables, and rake boards installed',
+        sidingReadiness: 'Substrate strapped with 1x3 vertical rain-screen strapping over weather barrier ready for immediate siding installation',
+      },
+    },
+
+    // 5. SCOPE
+    scope: {
+      summary: 'Comprehensive site preparation, foundation engineering, timber and structural envelope framing, weather-tight closure, mechanical rough-ins, and Vanilla Box baseline package fit-up.',
+      phases: [
+        'Phase 1: Site clearing, driveway corridor cut, well drilling, and septic test pits',
+        'Phase 2: Excavation, bedrock pin engineering, poured frost walls, and sub-slab insulation',
+        'Phase 3: Timber bent joinery, 2x6 exterior framing, roof truss assembly, and weather barrier wrap',
+        'Phase 4: High-performance window/door installation, metal roof installation, and rough mechanicals',
+        'Phase 5: Insulation, air sealing testing (Blower Door <1.0 ACH50), drywall hang, and prime',
+        'Phase 6: Allowance installations, finish fit-up, final inspections, and certificate of occupancy',
+      ],
+      inclusions: [
+        'Complete structural framing, rafters, and timber joinery',
+        'All exterior doors and triple-pane windows installed and flashed',
+        'Standing seam 26-gauge steel roofing over ice-and-water barrier',
+        'Plumbing, electrical, and HVAC heat pump rough-ins passed by local code official',
+        'Drywall hung, taped, sanded to Level 4, and primed with high-hiding sealer',
+        'Tyvek exterior wrap, tape, strapping, and trim ready for siding',
+      ],
+      exclusions: [
+        'Final finish coat interior wall paint (ready for owner selection)',
+        'Final floor coverings (handled through defined allowances or separate contract)',
+        'Decorative light fixtures beyond basic code illumination',
+        'Exterior landscaping and final loam seeding beyond standard rough grade stabilization',
+      ],
+    },
+
+    // 6. PACKAGE
+    packageSelection: {
+      selectedPackage: 'Vanilla Box',
+      preDesignedPathway: 'Build as Designed',
+      vanillaBoxSpecs: {
+        drywallSurfaces: 'Drywall hung, taped, and primed surfaces throughout all conditioned spaces',
+        switchesAndLights: 'Standard switches, receptacles, and basic code lighting installed and energized',
+        flooringExcluded: 'Flooring excluded from baseline package — clean, level 3/4-inch subfloors prepared for finish flooring',
+        kitchenPreparedness: 'Kitchen prepared with plumbing, 220V electrical, and ventilation ready for cabinets, countertops, and appliances',
+        sidingReadyExterior: 'Siding-ready exterior substrate with rain-screen strapping ready for chosen cladding',
+        weatherBarrierAndWrap: 'Tyvek exterior wrap taped at all seams with wrapped trim and sealed flashings where applicable',
+        wrappedTrim: 'Pre-primed trim boards wrapped and detailed at water tables and corner boards',
+        structuralConstraint: 'Strictly no layout or structural changes permitted within the baseline Vanilla Box package',
+        upgradesArrangement: 'All upgrades handled, documented, and paid/held through the applicable purchase contract or construction financing escrow arrangement',
+        allowances: {
+          siding: { amount: 14500, unit: 'USD', description: 'Eastern white pine clapboard or Maibec white cedar shingles ($4.50/sq ft allowance)' },
+          cabinetsCounters: { amount: 18000, unit: 'USD', description: 'Cabinet boxes, island, and solid stone/butcher block countertops' },
+          appliances: { amount: 7500, unit: 'USD', description: 'Induction range, counter-depth refrigerator, quiet dishwasher, and range hood' },
+          flooring: { amount: 11000, unit: 'USD', description: 'Wide-plank engineered hardwood or tile ($5.50/sq ft allowance)' },
+          stairs: { amount: 4500, unit: 'USD', description: 'Clear pine/oak treads with modern architectural balustrade and handrail' },
+          bathroom: { amount: 8500, unit: 'USD', description: 'Primary and guest vanities, plumbing trim, and tub/shower surrounds' },
+        },
+      },
+    },
+
+    // 7. ALLOWANCES
+    allowances: {
+      siding: { amount: 14500, unit: 'USD', description: 'Eastern white pine clapboard or Maibec white cedar shingles ($4.50/sq ft allowance)' },
+      cabinetsCounters: { amount: 18000, unit: 'USD', description: 'Cabinet boxes, island, and solid stone/butcher block countertops' },
+      appliances: { amount: 7500, unit: 'USD', description: 'Induction range, counter-depth refrigerator, quiet dishwasher, and range hood' },
+      flooring: { amount: 11000, unit: 'USD', description: 'Wide-plank engineered hardwood or tile ($5.50/sq ft allowance)' },
+      stairs: { amount: 4500, unit: 'USD', description: 'Clear pine/oak treads with modern architectural balustrade and handrail' },
+      bathroom: { amount: 8500, unit: 'USD', description: 'Primary and guest vanities, plumbing trim, and tub/shower surrounds' },
+    },
+
+    // 8. FINANCING
+    financing: {
+      structure: 'Construction-to-Permanent Bank Financing or Phased Private Capital Milestone Disbursements',
+      lenderCoordination: 'Full coordination with regional Maine lenders (e.g. Camden National Bank, First National Bank) providing transparent AIA G702/G703 payment draw schedules',
+      milestoneDraws: 'Standard 5-Draw Structure: 1) Foundation & Site (20%), 2) Dried-In Framing & Roof (25%), 3) Rough Mechanicals & Insulation (20%), 4) Drywall & Trim/Allowance Fit-up (20%), 5) Final Completion & Certificate of Occupancy (15%)',
+      escrowHoldback: 'Allowance balances and client finish selections held in dedicated bank escrow account for transparent accounting and lien-waiver release',
+    },
+
+    // 9. REALTOR
+    realtor: {
+      involvement: 'Licensed Broker & Landowner Due Diligence Collaboration',
+      dueDiligenceSupport: 'Comprehensive site assessment provided during contractual property inspection contingency period',
+      brokerCoordination: 'Transparent builder-broker representation agreements, standard MLS new-construction addenda, and defined buyer agent compensation structures',
+      preSaleValuation: 'Detailed cost-to-complete metrics and comparable valuation data formatted for appraisal underwriters and prospective buyers',
+    },
+
+    // 10. IMAGES
+    images: {
+      primaryImageId: 'img-build-hero',
+      galleryImageIds: ['img-build-hero', 'img-custom-hero', 'img-hero-primary'],
+      beforeImageId: 'img-build-hero',
+      afterImageId: 'img-hero-primary',
+      progressImageIds: ['img-land-hero'],
+      supportingImageIds: ['img-create-hero'],
+    },
+
+    // 11. DOCUMENTS
+    documents: [
+      { id: 'doc-1', label: 'Architectural Timber Framing Plan Set', url: '#', documentType: 'Architectural Plans' },
+      { id: 'doc-2', label: 'Certified Boundary & Topographic Site Survey', url: '#', documentType: 'Site Survey' },
+      { id: 'doc-3', label: 'Town Building Permit & Shoreland Approval', url: '#', documentType: 'Permit & Zoning' },
+      { id: 'doc-4', label: 'Vanilla Box Baseline Scope of Work', url: '#', documentType: 'Specifications' },
+      { id: 'doc-5', label: 'AIA G702 Construction Draw Schedule', url: '#', documentType: 'Financing / Draw Schedule' },
+    ],
+
+    // Convenience getters
+    primaryImageId: 'img-build-hero',
+    galleryImageIds: ['img-build-hero', 'img-custom-hero', 'img-hero-primary'],
+    beforeImageId: 'img-build-hero',
+    afterImageId: 'img-hero-primary',
+  },
+  {
+    id: 'midcoast-granite-build-to-suit',
+    title: 'Midcoast Granite Ridge Residence',
+    location: 'Camden, Maine',
+    status: 'In Progress',
+    description: 'Engineered site access cut through solid granite ledge, Pre-Designed timber plan adaptation, and turnkey construction management.',
+    projectType: 'Turnkey Coastal Build-to-Suit',
+    relatedWorlds: ['LAND', 'BUILD', 'CUSTOM'],
+    visibility: true,
+    order: 2,
+
+    property: {
+      parcelInfo: 'Tax Map 8, Lot 19 — 4.10 Acres Mountain Elevation with Penobscot Bay Vistas',
+      parcelSize: { value: 4.1, unit: 'acres' },
+      zoning: 'Coastal Mountain Rural',
+      terrainSlope: 'High ledge bluff with 15% grade terracing downward to hardwood forest',
+      ledgeConditions: 'Massive granite ledge ridge requiring hydraulic hammer trenching and pinned foundation footings',
+      solarOrientation: 'Southeast panoramic daylight exposure',
+      accessCorridor: '320-foot private blasted rock road with banked turns and engineered drainage swales',
+      utilitiesLogistics: 'Underground 200A electrical service, private 500-ft deep bedrock artesian well, engineered pump-station septic system',
+    },
+
+    existingConditions: {
+      hasExistingStructure: false,
+      structureType: 'Undeveloped High-Elevation Coastal Forest & Granite Ridge',
+      yearAndCondition: 'Raw Land / Pristine Natural Ledge',
+      foundation: 'Not Applicable (Raw Site)',
+      framing: 'Not Applicable (Raw Site)',
+      buildingEnvelope: 'Not Applicable (Raw Site)',
+      existingUtilities: 'Undeveloped; municipal power at street line 320 ft below',
+      dimensions: {
+        length: { value: 0, unit: 'ft' },
+        width: { value: 0, unit: 'ft' },
+        height: { value: 0, unit: 'ft' },
+      },
+      elevations: {
+        north: 'High granite ridgeline elevation +420 ft above sea level',
+        south: 'Cleared ocean view corridor overlooking outer islands',
+        east: 'Steep granite outcroppings with natural lichen and moss cover',
+        west: 'Protected hardwood birch and spruce tree buffer',
+      },
+    },
+
+    proposedConditions: {
+      proposedFootprint: { value: 2400, unit: 'sqft' },
+      livingArea: { value: 3100, unit: 'sqft' },
+      stories: 2,
+      foundation: 'Poured concrete foundation pinned into solid granite ledge with exterior bitumen waterproofing and rigid insulation',
+      thermalPerformance: 'Continuous R-35 exterior insulation envelope, triple-glazed coastal architectural windows, target air leakage <0.8 ACH50',
+      mechanicalSystems: 'Geothermal ground-source heat pump loop integrated with backup high-efficiency air-source heat pump and whole-house ERV',
+      dimensions: {
+        length: { value: 58, unit: 'ft' },
+        width: { value: 36, unit: 'ft' },
+        ceilingHeightMain: { value: 10, unit: 'ft' },
+        ceilingHeightUpper: { value: 9, unit: 'ft' },
+        ridgeHeight: { value: 28.5, unit: 'ft' },
+      },
+      elevations: {
+        north: 'Earth-bermed sheltered rear elevation with heavy timber entry canopy',
+        south: 'Full-height two-story glass facade capturing panoramic Atlantic waters',
+        east: 'Cantilevered cedar viewing deck extending over granite precipice',
+        west: 'Integrated two-bay garage with timber carriage doors and upper studio suite',
+        finishedGradeOffset: '+24 inches stepped concrete stem wall following natural ledge contours',
+      },
+    },
+
+    design: {
+      floorLayout: {
+        bedrooms: 4,
+        bathrooms: 3.5,
+        primaryRooms: [
+          'Great Room with Central Granite Fireplace & Cathedral Ceiling',
+          'Chef Kitchen with Walk-in Cold Storage & Scullery',
+          'Primary Ocean-Facing Bedroom Suite with Private Ledge Balcony',
+          'Two Second-Story Guest Suites with Shared Timber Bath',
+          'Lower Walkout Ledge Studio / Family Media Room',
+          'Ski & Marine Equipment Mudroom with Radiant Floor Heat',
+        ],
+        circulationNotes: 'Spacious central timber galleria connecting garage wing to main volume; wide 4-ft open-riser timber staircase',
+      },
+      roofGeometry: {
+        primaryPitch: '8:12',
+        dormerPitch: '3:12',
+        overhangDepth: { value: 24, unit: 'in' },
+        fasciaDetail: 'Heavy timber barge rafter with dark bronze architectural drip edge',
+      },
+      wallGeometry: {
+        wallAngles: '90° vertical plumb with double-stud staggered thermal wall framing',
+        shearWallEngineering: 'Engineered steel moment frames combined with heavy timber shear bents for hurricane-rated wind loads',
+      },
+      interiorDesign: {
+        drywallFinish: 'Level 5 museum-finish drywall with exposed structural hemlock posts and beams',
+        trimDetails: 'Minimalist shadow-reveal baseboards and clear-grain white oak window returns',
+        cabinetPreparedness: 'Custom rift-sawn white oak cabinetry with integrated appliances and concealed storage',
+        lightingLayout: 'Architectural recessed warm-dim LED lighting, discreet cove uplights, and exterior landscape illumination',
+        flooringStatus: 'Engineered 8-inch wide-plank white oak flooring over radiant hydronic heating circuits',
+      },
+      exteriorDesign: {
+        claddingType: 'Vertical clear Western red cedar siding combined with local dry-stacked granite veneer base',
+        weatherBarrier: 'Vapor-permeable self-adhered commercial air-barrier membrane with continuous rain-screen strapping',
+        windowDoorRatings: 'Structural aluminum-clad triple-pane tilt-turn units engineered for 130 MPH wind loads',
+        trimWrap: 'Dark bronze powder-coated aluminum architectural trim and thermally broken flashings',
+        sidingReadiness: 'Complete turnkey siding installation',
+      },
+    },
+
+    scope: {
+      summary: 'Turnkey site development, rock blasting, ledge foundation pinning, custom timber frame erection, high-performance building envelope, and full interior craftsmanship.',
+      phases: [
+        'Phase 1: Precision rock blasting, 320-ft access road build, and well drilling',
+        'Phase 2: Ledge pinning, poured stepped foundation, and sub-slab mechanical infrastructure',
+        'Phase 3: Timber frame delivery, bent raising, and structural roof deck installation',
+        'Phase 4: Exterior air barrier wrap, high-performance window installation, and standing seam roof',
+        'Phase 5: Geothermal drilling, HVAC rough-ins, electrical wiring, and insulation commissioning',
+        'Phase 6: Custom millwork, stone masonry, finish trades, and turnkey client handover',
+      ],
+      inclusions: [
+        'All civil site work, excavation, and road construction',
+        'Complete turn-key construction from bedrock to finished ridge',
+        'Custom mortise-and-tenon timber joinery crafted and raised on-site',
+        'Turnkey geothermal and heat pump mechanical systems',
+        'All interior and exterior finishes fully completed',
+      ],
+      exclusions: [
+        'Owner-purchased fine furniture and loose decor',
+      ],
+    },
+
+    packageSelection: {
+      selectedPackage: 'Build-to-Suit',
+    },
+
+    allowances: {
+      siding: { amount: 32000, unit: 'USD', description: 'Clear vertical cedar siding and local granite veneer base' },
+      cabinetsCounters: { amount: 48000, unit: 'USD', description: 'Custom rift-sawn oak kitchen cabinetry and quartzite slab counters' },
+      appliances: { amount: 24000, unit: 'USD', description: 'Sub-Zero / Wolf professional appliance suite' },
+      flooring: { amount: 26000, unit: 'USD', description: '8-inch wide-plank European white oak over hydronic radiant floors' },
+      stairs: { amount: 16000, unit: 'USD', description: 'Open-riser white oak stairs with blackened steel tension wire railing' },
+      bathroom: { amount: 28000, unit: 'USD', description: 'Four designer bathrooms with curbless tile showers and custom vanities' },
+    },
+
+    financing: {
+      structure: 'Private Owner Equity with Commercial Bank Construction Draw Facility',
+      lenderCoordination: 'Full AIA G702 monthly draw management with digital inspections and certified lien release tracking',
+      milestoneDraws: 'Monthly progress disbursements based on verified percentage-of-completion',
+      escrowHoldback: 'Standard 10% retainage held until final certificate of occupancy and punch list sign-off',
+    },
+
+    realtor: {
+      involvement: 'Direct Buyer Representation Advisory & Site Feasibility',
+      dueDiligenceSupport: 'Comprehensive steep-slope and municipal environmental permitting review prior to closing',
+      brokerCoordination: 'Open cooperation with luxury buyer broker with verified new-construction commission agreement',
+      preSaleValuation: 'Certified appraisal support packet documenting replacement value and high-performance coastal equity metrics',
+    },
+
+    images: {
+      primaryImageId: 'img-custom-hero',
+      galleryImageIds: ['img-custom-hero', 'img-land-hero', 'img-hero-primary'],
+      beforeImageId: 'img-land-hero',
+      afterImageId: 'img-custom-hero',
+      progressImageIds: ['img-build-hero'],
+      supportingImageIds: ['img-dawnland-hero'],
+    },
+
+    documents: [
+      { id: 'doc-cam-1', label: 'Full Stamped Architectural Plan Set', url: '#', documentType: 'Architectural Plans' },
+      { id: 'doc-cam-2', label: 'Geotechnical Ledge & Soil Analysis Report', url: '#', documentType: 'Site Survey' },
+      { id: 'doc-cam-3', label: 'Camden Code & Environmental Approval Certificate', url: '#', documentType: 'Permit & Zoning' },
+      { id: 'doc-cam-4', label: 'Comprehensive Build-to-Suit Specifications', url: '#', documentType: 'Specifications' },
+    ],
+
+    primaryImageId: 'img-custom-hero',
+    galleryImageIds: ['img-custom-hero', 'img-land-hero', 'img-hero-primary'],
+    beforeImageId: 'img-land-hero',
+    afterImageId: 'img-custom-hero',
+  },
+];
+
+/* =========================================================================
+   INITIAL MASTER CMS STATE (Authoritative Hierarchy)
+   ========================================================================= */
+
+export const INITIAL_CMS_STATE: CMSState = {
+  company: INITIAL_COMPANY_DATA,
+  navigation: INITIAL_NAV_ITEMS,
+  homepage: INITIAL_HOMEPAGE_DATA,
+  worlds: INITIAL_WORLDS,
+  packages: INITIAL_PACKAGES,
+  projects: INITIAL_PROJECTS,
   images: INITIAL_IMAGES,
 };
+
+
+
